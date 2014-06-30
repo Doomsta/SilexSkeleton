@@ -109,7 +109,6 @@ class Application extends \Silex\Application
     public function run(Request $request = null)
     {
         if ($this['isCli']) {
-            echo 'test';
             $this['console']->run();
         }
         parent::run($request);
