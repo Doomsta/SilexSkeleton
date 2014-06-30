@@ -1,0 +1,3 @@
+debug: false
+twig.options:
+  cache: %ROOT_PATH%/tmp/twig

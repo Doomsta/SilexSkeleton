@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<title> {{ app.site.title }} </title>
+<head>
+    {% block css %}
+        <link href="{{ app.request.basepath }}/assets/css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ app.request.basepath }}/assets/css/app.css" rel="stylesheet">
+    {%  endblock %}
+</head>
+<body>
+{% include 'misc/navbar.twig' %}
+{% include 'misc/subhead.twig' %}
+<div class="container">
+    <div class="notify">
+    {% block notifications %}
+        {% include 'misc/notifications.twig' %}
+    {%  endblock %}
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            {% block widgets %}
+            {% endblock %}
+        </div>
+        <div class="col-lg-9">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    {% block footer %}
+    {% endblock %}
+</footer>
+{% block javascript %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="assets/js/jQuery.min.js"><\/script>')</script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="{{ app.request.basepath }}/assets/js/bootstrap.min.js"></script>
+{% endblock %}
+
+</body>
+</html>
+
+

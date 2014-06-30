@@ -1,0 +1,6 @@
+twig.path: %APP_PATH%/Views
+monolog.name: 'test'
+site:
+  name: app
+  title: APP_TITILE
+  description: desc
