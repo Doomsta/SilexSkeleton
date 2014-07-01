@@ -4,7 +4,7 @@
         "silex/silex": "~1.1",
         "silex/web-profiler": "1.0.x-dev",
         "symfony/twig-bridge": "2.4.*",
-        "lexpress/console-service-provider": "dev-master",
+        "knplabs/console-service-provider": "dev-master",
         "igorw/config-service-provider": "dev-master",
         "symfony/yaml": "~2.1.",
         "monolog/monolog": ">=1.0.0"
@@ -12,7 +12,8 @@
 
     "autoload": {
         "psr-0": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "Doomsta\\": "src/"
         }
     }
 }

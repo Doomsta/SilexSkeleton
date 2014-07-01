@@ -2,13 +2,13 @@
 
 namespace App\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Knp\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Greed extends Command
+class GreedCommand extends Command
 {
     protected function configure()
     {
@@ -24,9 +24,9 @@ class Greed extends Command
     {
         $name = $input->getArgument('name');
         if ($name) {
-            $text = 'Hello '.$name;
+            $text = 'Hello '.$name.' !';
         } else {
-            $text = 'Hello';
+            $text = 'Hello!';
         }
 
         if ($input->getOption('yell')) {

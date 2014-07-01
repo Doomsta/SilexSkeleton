@@ -2,4 +2,5 @@
 *.iml
 /vendor
 tmp/*
+*.log
 composer.lock

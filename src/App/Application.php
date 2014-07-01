@@ -2,10 +2,12 @@
 
 namespace App;
 
-use App\Command\Greed;
+use App\Command\Debug\RouterCommand;
+use App\Command\GreedCommand;
 use App\Controller\HomeController;
+use Doomsta\Silex\Traits\ConsoleTrait;
 use Igorw\Silex\ConfigServiceProvider;
-use LExpress\Silex\ConsoleServiceProvider;
+use Knp\Provider\ConsoleServiceProvider;
 use Silex\Application\MonologTrait;
 use Silex\Application\TwigTrait;
 use Silex\Application\UrlGeneratorTrait;
@@ -27,6 +29,7 @@ class Application extends \Silex\Application
     use MonologTrait;
     use UrlGeneratorTrait;
     use TwigTrait;
+    use ConsoleTrait;
 
     public function __construct($env = 'dev')
     {
@@ -100,10 +103,10 @@ class Application extends \Silex\Application
         $this->register(new ConsoleServiceProvider(), array(
             'console.name'    => $this['site']['name'],
             'console.version' => '0.0',
+            'console.project_directory' => ROOT_PATH
         ));
-        $this['command.greed'] = $this->share(function ($app) {
-            return new Greed();
-        });
+        $this->addCommand(new GreedCommand());
+        $this->addCommand(new RouterCommand());
     }
 
     public function run(Request $request = null)
