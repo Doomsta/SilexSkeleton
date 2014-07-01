@@ -1,4 +1,10 @@
 {
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/RndStuff/silex-traits.git"
+        }
+    ],
     "require": {
         "php": ">=5.3.3",
         "silex/silex": "~1.1",
@@ -7,13 +13,13 @@
         "knplabs/console-service-provider": "dev-master",
         "igorw/config-service-provider": "dev-master",
         "symfony/yaml": "~2.1.",
-        "monolog/monolog": ">=1.0.0"
+        "monolog/monolog": ">=1.0.0",
+        "openworkers/redobject": "dev-develop",
+        "rndstuff/silex-traits": "dev-master"
     },
-
     "autoload": {
         "psr-0": {
-            "App\\": "src/",
-            "Doomsta\\": "src/"
+            "App\\": "src/"
         }
     }
 }

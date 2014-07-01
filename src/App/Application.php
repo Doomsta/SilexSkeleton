@@ -5,9 +5,9 @@ namespace App;
 use App\Command\Debug\RouterCommand;
 use App\Command\GreedCommand;
 use App\Controller\HomeController;
-use Doomsta\Silex\Traits\ConsoleTrait;
 use Igorw\Silex\ConfigServiceProvider;
 use Knp\Provider\ConsoleServiceProvider;
+use RndStuff\Silex\Traits\KnpConsoleTrait;
 use Silex\Application\MonologTrait;
 use Silex\Application\TwigTrait;
 use Silex\Application\UrlGeneratorTrait;
@@ -29,7 +29,7 @@ class Application extends \Silex\Application
     use MonologTrait;
     use UrlGeneratorTrait;
     use TwigTrait;
-    use ConsoleTrait;
+    use KnpConsoleTrait;
 
     public function __construct($env = 'dev')
     {
