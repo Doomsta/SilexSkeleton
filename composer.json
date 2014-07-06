@@ -14,7 +14,7 @@
         "igorw/config-service-provider": "dev-master",
         "symfony/yaml": "~2.1.",
         "monolog/monolog": ">=1.0.0",
-        "openworkers/redobject": "dev-develop",
+        "doctrine/dbal": "2.2.*",
         "rndstuff/silex-traits": "dev-master"
     },
     "autoload": {

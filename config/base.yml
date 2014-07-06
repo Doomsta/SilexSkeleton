@@ -4,3 +4,6 @@ site:
   name: app
   title: APP_TITILE
   description: desc
+db.options:
+  driver: pdo_sqlite
+  path: %DATA_PATH%/sqlite.db

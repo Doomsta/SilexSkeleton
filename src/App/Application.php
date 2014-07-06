@@ -5,18 +5,22 @@ namespace App;
 use App\Command\Debug\RouterCommand;
 use App\Command\GreedCommand;
 use App\Controller\HomeController;
+use Doctrine\DBAL\Driver\Connection;
 use Igorw\Silex\ConfigServiceProvider;
 use Knp\Provider\ConsoleServiceProvider;
+use RndStuff\Silex\Traits\DoctrineDbalTrait;
 use RndStuff\Silex\Traits\KnpConsoleTrait;
 use Silex\Application\MonologTrait;
 use Silex\Application\TwigTrait;
 use Silex\Application\UrlGeneratorTrait;
+use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
+use Silex\Route\SecurityTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 
@@ -51,6 +55,7 @@ class Application extends \Silex\Application
             array(
                 'ROOT_PATH' => ROOT_PATH,
                 'APP_PATH' => __DIR__,
+                'DATA_PATH' => ROOT_PATH . '/data',
                 'LOG_PATH' => ROOT_PATH . '/log',
             )
         ));
@@ -59,6 +64,7 @@ class Application extends \Silex\Application
             array(
                 'ROOT_PATH' => ROOT_PATH,
                 'APP_PATH' => __DIR__,
+                'DATA_PATH' => ROOT_PATH . '/data',
                 'LOG_PATH' => ROOT_PATH . '/log',
             )
         ));
@@ -74,6 +80,7 @@ class Application extends \Silex\Application
         );
         $this->register(new UrlGeneratorServiceProvider());
         $this->register(new ServiceControllerServiceProvider());
+        $this->register(new DoctrineServiceProvider);
         $this->register(new SessionServiceProvider());
         $this->register(new TwigServiceProvider(),
             array(
