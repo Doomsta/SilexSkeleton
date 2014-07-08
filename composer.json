@@ -7,7 +7,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "silex/silex": "~1.1",
+        "silex/silex": "~1.2",
         "silex/web-profiler": "1.0.x-dev",
         "symfony/twig-bridge": "2.4.*",
         "knplabs/console-service-provider": "dev-master",

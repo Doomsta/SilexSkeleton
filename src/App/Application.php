@@ -6,6 +6,7 @@ use App\Command\Debug\RouterCommand;
 use App\Command\GreedCommand;
 use App\Controller\HomeController;
 use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Statement;
 use Igorw\Silex\ConfigServiceProvider;
 use Knp\Provider\ConsoleServiceProvider;
 use RndStuff\Silex\Traits\DoctrineDbalTrait;
@@ -34,6 +35,7 @@ class Application extends \Silex\Application
     use UrlGeneratorTrait;
     use TwigTrait;
     use KnpConsoleTrait;
+    use DoctrineDbalTrait;
 
     public function __construct($env = 'dev')
     {
