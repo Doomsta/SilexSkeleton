@@ -2,9 +2,22 @@
 
 namespace App;
 
+use App\Command\Assetic\DumpCommand;
 use App\Command\Debug\RouterCommand;
 use App\Command\GreedCommand;
+use App\Command\InstallCommand;
 use App\Controller\HomeController;
+use Assetic\Asset\AssetCache;
+use Assetic\Asset\GlobAsset;
+use Assetic\AssetManager;
+use Assetic\Cache\FilesystemCache;
+use Assetic\Filter\CssMinFilter;
+use Assetic\Filter\JSMinFilter;
+use Assetic\Filter\LessphpFilter;
+use Assetic\Filter\UglifyJsFilter;
+use Assetic\Filter\Yui\JsCompressorFilter;
+use Assetic\FilterManager;
+use CssMin;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Statement;
 use Igorw\Silex\ConfigServiceProvider;
@@ -22,6 +35,8 @@ use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
 use Silex\Route\SecurityTrait;
+use SilexAssetic\Assetic\Dumper;
+use SilexAssetic\AsseticServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 
@@ -44,6 +59,7 @@ class Application extends \Silex\Application
         $this['isCli'] = PHP_SAPI === 'cli';
         $this->initConfig($env);
         $this->initProviders();
+        $this->initAssectic();
         $this->initMountPoints();
         if ($this['isCli']) {
             $this->initCli();
@@ -70,6 +86,24 @@ class Application extends \Silex\Application
                 'LOG_PATH' => ROOT_PATH . '/log',
             )
         ));
+    }
+
+    protected function initAssectic()
+    {
+
+        $this->register(new AsseticServiceProvider(), array(
+            'assetic.path_to_web' => ROOT_PATH.'/public',
+            'assetic.options' => array(
+                'debug' => $this['debug'],
+                'auto_dump_assets' => $this['debug'],
+            )
+        ));
+        $this['assetic.filter_manager'] = $this->share(
+            $this->extend('assetic.filter_manager', function ($fm, $this) {
+                $fm->set('css', new CssMinFilter());
+                return $fm;
+            })
+        );
     }
 
     protected function initProviders()
@@ -110,12 +144,14 @@ class Application extends \Silex\Application
     protected function initCli()
     {
         $this->register(new ConsoleServiceProvider(), array(
-            'console.name'    => $this['site']['name'],
+            'console.name' => $this['site']['name'],
             'console.version' => '0.0',
             'console.project_directory' => ROOT_PATH
         ));
         $this->addCommand(new GreedCommand());
         $this->addCommand(new RouterCommand());
+        $this->addCommand(new InstallCommand());
+        $this->addCommand(new DumpCommand());
     }
 
     public function run(Request $request = null)

@@ -18,6 +18,6 @@ class HomeController extends PageController
 
     public function indexAction(Request $request)
     {
-        return $this->getApp()->render('controller/home/index.twig');
+        return $this->getApp()->render('Controller/Home/index.twig');
     }
 }
