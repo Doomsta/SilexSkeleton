@@ -2,24 +2,18 @@
 
 namespace App;
 
-use App\Command\Assetic\DumpCommand;
-use App\Command\Debug\RouterCommand;
-use App\Command\GreedCommand;
-use App\Command\InstallCommand;
+
+use App\Console\Command\GreedCommand;
+use App\Console\Command\InstallCommand;
+use App\Console\Command\Assetic\DumpCommand;
+use App\Console\Command\Assetic\WatchCommand;
+use App\Console\Command\Debug\RouterCommand;
 use App\Controller\HomeController;
-use Assetic\Asset\AssetCache;
-use Assetic\Asset\GlobAsset;
-use Assetic\AssetManager;
-use Assetic\Cache\FilesystemCache;
+use App\Controller\SomeHomeController;
+use App\Controller\UserController;
 use Assetic\Filter\CssMinFilter;
-use Assetic\Filter\JSMinFilter;
-use Assetic\Filter\LessphpFilter;
-use Assetic\Filter\UglifyJsFilter;
-use Assetic\Filter\Yui\JsCompressorFilter;
-use Assetic\FilterManager;
-use CssMin;
-use Doctrine\DBAL\Driver\Connection;
-use Doctrine\DBAL\Statement;
+use Dflydev\Silex\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
+use Doctrine\ORM\EntityManager;
 use Igorw\Silex\ConfigServiceProvider;
 use Knp\Provider\ConsoleServiceProvider;
 use RndStuff\Silex\Traits\DoctrineDbalTrait;
@@ -29,16 +23,18 @@ use Silex\Application\TwigTrait;
 use Silex\Application\UrlGeneratorTrait;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\MonologServiceProvider;
+use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\WebProfilerServiceProvider;
-use Silex\Route\SecurityTrait;
-use SilexAssetic\Assetic\Dumper;
 use SilexAssetic\AsseticServiceProvider;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
+use Tacker\Configurator;
+use Tacker\LoaderBuilder;
 
 if (!defined('ROOT_PATH')) {
     define('ROOT_PATH', __DIR__ . '/../..');
@@ -57,8 +53,10 @@ class Application extends \Silex\Application
         parent::__construct();
         $this['env'] = $env;
         $this['isCli'] = PHP_SAPI === 'cli';
+        $this->initPathConfig();
         $this->initConfig($env);
         $this->initProviders();
+        $this->initUser();
         $this->initAssectic();
         $this->initMountPoints();
         if ($this['isCli']) {
@@ -66,24 +64,27 @@ class Application extends \Silex\Application
         }
     }
 
+    protected function initPathConfig()
+    {
+        $this->register(new ConfigServiceProvider(ROOT_PATH . '/config/paths.yml'));
+        $this['path.config'] = ROOT_PATH . '/config';
+    }
+
     protected function initConfig($env)
     {
-        $this->register(new ConfigServiceProvider(
-            ROOT_PATH . '/config/base.yml',
-            array(
-                'ROOT_PATH' => ROOT_PATH,
-                'APP_PATH' => __DIR__,
-                'DATA_PATH' => ROOT_PATH . '/data',
-                'LOG_PATH' => ROOT_PATH . '/log',
-            )
-        ));
+        $finder = new Finder();
+        $finder->in($this['path.config'])->name('/^'.$env.'.yml$/');
+        foreach($finder as $config) {
+            $this->register(new ConfigServiceProvider(ROOT_PATH . '/config/base.yml'));
+        }
+
         $this->register(new ConfigServiceProvider(
             ROOT_PATH . '/config/' . $env . '.yml',
             array(
                 'ROOT_PATH' => ROOT_PATH,
                 'APP_PATH' => __DIR__,
-                'DATA_PATH' => ROOT_PATH . '/data',
-                'LOG_PATH' => ROOT_PATH . '/log',
+                'DATA_PATH' => ROOT_PATH . '/storage',
+                'LOG_PATH' => ROOT_PATH . '/storage/log',
             )
         ));
     }
@@ -138,7 +139,13 @@ class Application extends \Silex\Application
 
     protected function initMountPoints()
     {
-        $this->mount('/', new HomeController());
+        $this
+            ->mount('/', new HomeController())
+            ->mount('/hallo', new HomeController())
+            ->mount('/test', new SomeHomeController())
+            ->mount('/test/test', new SomeHomeController())
+
+        ;
     }
 
     protected function initCli()
@@ -152,6 +159,7 @@ class Application extends \Silex\Application
         $this->addCommand(new RouterCommand());
         $this->addCommand(new InstallCommand());
         $this->addCommand(new DumpCommand());
+        $this->addCommand(new WatchCommand());
     }
 
     public function run(Request $request = null)
@@ -161,4 +169,44 @@ class Application extends \Silex\Application
         }
         parent::run($request);
     }
+
+    private function initUser()
+    {
+        $this->register(new DoctrineOrmServiceProvider, array(
+            #"orm.proxies_dir" => "/path/to/proxies",
+            "orm.em.options" => array(
+                "mappings" => array(
+                    // Using actual filesystem paths
+                    array(
+                        "type" => "annotation",
+                        "namespace" => "App\\Model\\Entity",
+                        "path" => __DIR__."/src/App/Entity",
+                    ),
+                ),
+            ),
+        ));
+        $this->register(new SecurityServiceProvider(), array(
+            'security.firewalls' => array(
+                'unsecured' => array(
+                    'pattern' => '^/hallo',
+                    'form' => array('login_path' => '/user/login', 'check_path' => '/user/checkLogin'),
+                    'users' => array(
+                        'admin' => array('ROLE_ADMIN', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg=='),
+                    ),
+                ),
+                'admin' => array(
+                    'pattern' => '^/admin/',
+                    'form' => array('login_path' => '/login', 'check_path' => '/admin/login_check'),
+                    'users' => array(
+                        'admin' => array('ROLE_ADMIN', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg=='),
+                    ),
+                ),
+            )
+        ));
+        $this['user.manager'] = new UserManager($this, $this['orm.em']);
+        $this->register(new UserServiceProvider());
+        $this->mount('/user', new UserController());
+    }
+
+
 }

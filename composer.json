@@ -3,22 +3,31 @@
         {
             "type": "git",
             "url": "https://github.com/RndStuff/silex-traits.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/Doomsta/silexuser.git"
         }
     ],
     "require": {
         "php": ">=5.3.3",
-        "silex/silex": "~1.2",
-        "silex/web-profiler": "1.0.x-dev",
+        "silex/silex": "*",
         "symfony/twig-bridge": "2.4.*",
         "knplabs/console-service-provider": "dev-master",
         "igorw/config-service-provider": "dev-master",
         "symfony/yaml": "~2.1.",
         "monolog/monolog": ">=1.0.0",
-        "doctrine/dbal": "2.2.*",
-        "mheap/Silex-Assetic": "*",
+        "doctrine/dbal": "*",
+        "doctrine/orm": "*",
+        "dflydev/doctrine-orm-service-provider": "*",
+        "mheap/Silex-Assetic": "1.0.*",
         "natxet/cssmin": "*@dev",
         "twitter/bootstrap": "dev-master",
-        "rndstuff/silex-traits": "dev-master"
+        "rndstuff/silex-traits": "dev-master",
+        "symfony/doctrine-bridge": "~2.3",
+        "symfony/security": "~2.6",
+        "symfony/form": "~2.3",
+        "symfony/validator": "~2.3"
     },
     "autoload": {
         "psr-0": {

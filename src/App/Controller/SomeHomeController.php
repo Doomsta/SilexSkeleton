@@ -6,7 +6,7 @@ namespace App\Controller;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 
-class HomeController extends PageController
+class SomeHomeController extends PageController
 {
 
     const TEMPLATE_PATH = 'Controller/Home';
@@ -17,7 +17,9 @@ class HomeController extends PageController
      */
     protected function getRoutes(ControllerCollection $controllers)
     {
-        $controllers->get('/', array($this, 'indexAction'))->bind('home.index');
+        $controllers->get('/', array($this, 'indexAction'));
+        $controllers->get('/moep', array($this, 'indexAction'));
+        $controllers->post('/moep', array($this, 'indexAction'));
         return $controllers;
     }
 

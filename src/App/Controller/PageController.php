@@ -3,58 +3,85 @@
 namespace App\Controller;
 
 use App\Application;
+use Monolog\Logger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Security\Core\SecurityContext;
 
-abstract class PageController implements ControllerProviderInterface
+abstract class PageController implements ControllerProviderInterface, LoggerAwareInterface
 {
     /** @var  Application */
     private $app;
+    /** @var LoggerInterface */
+    private $logger;
 
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->logger = new NullLogger();
+    }
+
+    /**
+     * @param \Silex\Application $app
+     * @return mixed
+     */
     public function connect(\Silex\Application $app)
     {
         $this->app = $app;
         return $this->getRoutes($this->getControllerFactory());
     }
 
+    /**
+     * @param ControllerCollection $controllers
+     * @return ControllerCollection
+     */
     abstract protected function getRoutes(ControllerCollection $controllers);
 
     /**
      * @return ControllerCollection
      */
-    protected function getControllerFactory() {
-        return $this->app['controllers_factory'];
-    }
-
-    /**
-     * @return HttpKernel
-     */
-    protected function getKernel() {
-        return $this->app['kernel'];
-    }
-
-    /**
-     * @return Request
-     */
-    protected function getRequest() {
-        return $this->app['request'];
-    }
-
-    /**
-     * @return SecurityContext
-     */
-    protected function getSecurity() {
-        return $this->app['security'];
+    private function getControllerFactory()
+    {
+        return $this->getApp()['controllers_factory'];
     }
 
     /**
      * @return Application
      */
-    protected function getApp()
+    private function getApp()
     {
         return $this->app;
+    }
+
+    protected function render($view, array $parameters = array(), Response $response = null)
+    {
+        return $this->getApp()->render($view, $parameters, $response);
+    }
+
+    /**
+     * @param $level
+     * @param $message
+     * @param array $context
+     */
+    protected function log($level, $message, array $context = array())
+    {
+        $this->logger->log($level, $message, $context);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return void
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }
