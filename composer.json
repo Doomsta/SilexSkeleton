@@ -26,8 +26,11 @@
         "rndstuff/silex-traits": "dev-master",
         "symfony/doctrine-bridge": "~2.3",
         "symfony/security": "~2.6",
-        "symfony/form": "~2.3",
-        "symfony/validator": "~2.3"
+        "symfony/form": "~2.6",
+        "symfony/validator": "~2.6",
+        "symfony/config": "~2.6",
+        "symfony/translation": "~2.6",
+        "symfony/security-csrf": "~2.6"
     },
     "autoload": {
         "psr-0": {

@@ -3,6 +3,7 @@
 namespace App\Model\Entity;
 
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Events;
@@ -15,17 +16,16 @@ use Doctrine\Common\Collections\ArrayCollection;
  * A simple User model.
  * App\Model\Entity\User
  * @Entity
- * @ORM\HasLifecycleCallbacks
- * @ORM\Table(name="users")
+ * @HasLifecycleCallbacks
  */
 
-class User implements UserInterface
+class User implements UserInterface, EquatableInterface
 {
 
     /**
      * @Column(type="integer")
      * @Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @GeneratedValue
      */
     protected $id;
     /**
@@ -33,7 +33,7 @@ class User implements UserInterface
      */
     protected $email;
     /**
-     * @Column(type="string", length=64)
+     * @Column(type="string", length=128)
      */
     protected $password;
     /**
@@ -282,5 +282,24 @@ class User implements UserInterface
     {
         // See https://en.gravatar.com/site/implement/images/ for available options.
         return '//www.gravatar.com/avatar/' . md5(strtolower(trim($this->getEmail()))) . '?s=' . $size . '&d=identicon';
+    }
+
+    /**
+     * The equality comparison should neither be done by referential equality
+     * nor by comparing identities (i.e. getId() === getId()).
+     *
+     * However, you do not need to compare every attribute, but only those that
+     * are relevant for assessing whether re-authentication is required.
+     *
+     * Also implementation should consider that $user instance may implement
+     * the extended user interface `AdvancedUserInterface`.
+     *
+     * @param UserInterface $user
+     *
+     * @return bool
+     */
+    public function isEqualTo(UserInterface $user)
+    {
+        return ($this->getUsername() == $user->getUsername());
     }
 }

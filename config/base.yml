@@ -5,5 +5,8 @@ site:
   title: APP_TITILE
   description: desc
 db.options:
-  driver: pdo_sqlite
-  path: %DATA_PATH%/sqlite.db
+  driver: pdo_mysql
+  dbname: app
+  host: localhost
+  user: root
+  password:

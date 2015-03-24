@@ -7,21 +7,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="role")
- * @ORM\Entity()
+ * @Table(name="role")
+ * @Entity()
  */
 class Role implements RoleInterface
 {
     /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @Column(name="id", type="integer")
+     * @Id()
+     * @GeneratedValue(strategy="AUTO")
      */
     private $id;
 
 
     /**
-     * @ORM\Column(name="role", type="string", length=20, unique=true)
+     * @Column(name="role", type="string", length=20, unique=true)
      */
     private $role;
 

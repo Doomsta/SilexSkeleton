@@ -1,20 +1,13 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: arandel
- * Date: 13.06.14
- * Time: 21:48
- */
 
 namespace App;
-
-
 
 use Doctrine\ORM\EntityManager;
 use App\Model\Entity\User;
 use App\Model\Repository\UserRepository;
-use Silex\Application;
+use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -40,7 +33,6 @@ class UserManager implements UserProviderInterface
         $this->app = $app;
         $this->repo = $entityManager->getRepository('App\Model\Entity\User');
         $this->entityManager = $entityManager;
-
     }
 
     /**
@@ -250,7 +242,6 @@ class UserManager implements UserProviderInterface
      */
     public function getCurrentUser()
     {
-        error_log(__METHOD__);
         if ($this->isLoggedIn()) {
             return $this->app['security']->getToken()->getUser();
         }

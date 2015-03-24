@@ -55,7 +55,7 @@ class UserController implements ControllerProviderInterface
 
         $controllers->match('/login', array($this, 'loginAction'))->bind('user.login');
         $controllers->match('/register', array($this, 'registerAction'))->bind('user.register');
-        $controllers->match('/checkLogin', '')->bind('user.checkLogin');
+        $controllers->match('/checkLogin',  array($this, 'checkLoginAction'))->bind('user.checkLogin');
         $controllers->match('/recovery', array($this, 'recoveryAction'))->bind('user.recovery');
 
         $controllers->get('/', array($this, 'viewSelfAction'))
@@ -86,19 +86,12 @@ class UserController implements ControllerProviderInterface
      */
     public function loginAction(Application $app)
     {
-        error_log(__METHOD__.' // '.__LINE__);
         if ($app['user.manager']->isLoggedIn()) {
-            error_log(__METHOD__.' // '.__LINE__);
             $path = $app['session']->get('_security.global.target_path')
                 ?: $app['url_generator']->generate($app['user.login.redirect']);
-
             return $app->redirect($path);
         }
-
-        error_log(__METHOD__.' // '.__LINE__);
-        error_log($app['user.templates']['login']);
         return $app['twig']->render('Controller/User/login.twig', [
-            'layoutTemplate' => $app['user.templates']['layoutTemplate'],
             'error' => $app['security.last_error']($app['request']),
             'last_username' => $app['session']->get('_security.last_username'),
         ]);
@@ -113,7 +106,6 @@ class UserController implements ControllerProviderInterface
      */
     public function registerAction(Request $request, Application $app)
     {
-
         /** @var Form $form */
         $form = $app['user.form.registration']();
         /** @var EntityManager $em */
@@ -121,12 +113,13 @@ class UserController implements ControllerProviderInterface
         /** @var SecurityContext $security */
         $security = $app['security'];
 
+
         $form->handleRequest($request);
         if ($form->isValid()) {
             $em->getConnection()->beginTransaction();
             try {
                 $user = $form->getData();
-                $user->addRole($app['user.default_role']);
+                #$user->addRole($app['user.default_role']);
                 $em->persist($user);
                 $em->flush();
                 $em->getConnection()->commit();
@@ -143,10 +136,13 @@ class UserController implements ControllerProviderInterface
                 $form->addError(new FormError(sprintf('Registration failed %s', $app['debug'] ? $e->getMessage() : null)));
             }
         }
-        return $app['twig']->render($app['user.templates']['register'], [
-            'layoutTemplate' => $app['user.templates']['layoutTemplate'],
-            'form' => $form->createView(),
-        ]);
+        $form = $form->createView();
+        return $app['twig']->render(
+            'Controller/User/register.twig',
+            [
+                'form' => $form,
+            ]
+        );
     }
 
 
@@ -165,8 +161,7 @@ class UserController implements ControllerProviderInterface
         if (!$user) {
             throw new NotFoundHttpException('No user was found with that ID.');
         }
-        return $app['twig']->render($app['user.templates']['view'], array(
-            'layoutTemplate' => $app['user.templates']['layoutTemplate'],
+        return $app['twig']->render('Controller/User/view.twig', array(
             'user' => $user,
         ));
 
@@ -174,8 +169,6 @@ class UserController implements ControllerProviderInterface
 
     public function viewSelfAction(Application $app)
     {
-        $app['user'];
-        error_log('hallo;');
         if (!$app['user']) {
             return $app->redirect($app['url_generator']->generate('user.login'));
         }
@@ -186,15 +179,23 @@ class UserController implements ControllerProviderInterface
     {
         return $app['twig']->render(
             $app['user.templates']['recovery'], array(
-            'layoutTemplate' => $app['user.templates']['layoutTemplate'],
-        ));
+                'layoutTemplate' => $app['user.templates']['layoutTemplate'],
+            )
+        );
     }
 
 
+    public function checkLoginAction(Request $request, Application $app)
+    {
+        /** @var UserManager $userManager */
+        $userManager = $app['user.manager'];
+var_dump($userManager->isLoggedIn());
+        return 1;
+    }
+
     public function listAction(Application $app, Request $request)
     {
-        return $app['twig']->render('@User/list.twig', array(
-            'layoutTemplate' => $app['user.templates']['layoutTemplate'],
+        return $app['twig']->render('Controller/User/list.twig', array(
             'users' => $app['user.manager']->getAllUsers()
         ));
     }

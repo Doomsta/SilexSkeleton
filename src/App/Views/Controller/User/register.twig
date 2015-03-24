@@ -1,9 +1,9 @@
-{% extends layoutTemplate  %}
+{% extends "Layout/base.twig" %}
 
 {% block title %}Register{% endblock %}
 
 {% block content %}
-    {% form_theme form '@User/Layout/form_theme.twig' %}
+    {% form_theme form 'Layout/form_theme.twig' %}
     {% block form %}
         {{ form_start(form) }}
         {{ form_errors(form) }}
