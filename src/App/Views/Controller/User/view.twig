@@ -17,12 +17,21 @@
         </div>
         <div class="panel-body">
             <dl class="dl-horizontal">
-                <dt>name: </dt>
+                <dt>Name:</dt>
                 <dd>{{ user.username }}</dd>
+                <dt>EMail:</dt>
+                <dd>{{ user.email }}</dd>
                 <dt>Registered: </dt>
                 <dd>{{ user.timeCreated|date('F j, Y') }}</dd>
-
-                <dt>roles: </dt>
+                <dt>Groups: </dt>
+                <dd>
+                    <ul>
+                        {% for group in user.getGroups %}
+                            <li>{{ group }}</li>
+                        {% endfor %}
+                    </ul>
+                </dd>
+                <dt>Roles: </dt>
                 <dd>
                     <ul>
                         {% for role in user.getRoles %}

@@ -10,8 +10,10 @@ use App\Console\Command\Debug\RouterCommand;
 use App\Controller\HomeController;
 use App\Controller\SomeHomeController;
 use App\Controller\UserController;
+use App\Model\TablePrefix;
 use Assetic\Filter\CssMinFilter;
 use Dflydev\Silex\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Igorw\Silex\ConfigServiceProvider;
 use Knp\Provider\ConsoleServiceProvider;
 use RndStuff\Silex\Traits\DoctrineDbalTrait;
@@ -31,6 +33,7 @@ use Silex\Provider\UrlGeneratorServiceProvider;
 use SilexAssetic\AsseticServiceProvider;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Console\Application as ConsoleApplication;
 
 
 if (!defined('ROOT_PATH')) {
@@ -58,7 +61,7 @@ class Application extends \Silex\Application
         $this->initMountPoints();
         if ($this['isCli']) {
             $this->initCli();
-     }
+        }
     }
 
     protected function initPathConfig()
@@ -141,11 +144,22 @@ class Application extends \Silex\Application
             'console.version' => '0.0',
             'console.project_directory' => ROOT_PATH
         ));
-        $this->addCommand(new GreedCommand());
-        $this->addCommand(new RouterCommand());
-        $this->addCommand(new InstallCommand());
-        $this->addCommand(new DumpCommand());
-        $this->addCommand(new WatchCommand());
+
+        #return ConsoleRunner::createHelperSet($app['orm']);
+        $this->extend('console', function ($console) {
+            /** @var ConsoleApplication $console */
+            $console->setHelperSet(ConsoleRunner::createHelperSet($this['orm.em']));
+            $console->add(new GreedCommand());
+            $console->add(new RouterCommand());
+            $console->add(new InstallCommand());
+            $console->add(new DumpCommand());
+            $console->add(new WatchCommand());
+            $console->add(new \Doctrine\ORM\Tools\Console\Command\ClearCache\QueryCommand());
+            $console->add(new \Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand());
+            $console->add(new \Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand());
+            $console->add(new \Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand());
+            return $console;
+        });
     }
 
     public function run(Request $request = null)
@@ -158,9 +172,6 @@ class Application extends \Silex\Application
 
     private function initUser()
     {
-        //set custom encoder
-       #['security.encoder.digest']
-
         $this->register(new FormServiceProvider());
         $this->register(new TranslationServiceProvider());
         $this->register(new DoctrineOrmServiceProvider, array(
@@ -176,6 +187,7 @@ class Application extends \Silex\Application
                 ),
             ),
         ));
+        $this['dbs.event_manager']['default']->addEventListener(\Doctrine\ORM\Events::loadClassMetadata, new TablePrefix('app_'));
         $this->register(new SecurityServiceProvider(), array(
             'security.firewalls' => array(
                 'user.login' => array(

@@ -18,8 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @Entity
  * @HasLifecycleCallbacks
  */
-
-class User implements UserInterface, EquatableInterface
+class User extends BaseEntity implements UserInterface, EquatableInterface
 {
 
     /**
@@ -52,6 +51,10 @@ class User implements UserInterface, EquatableInterface
      * @ManyToMany(targetEntity="Role", inversedBy="users")
      */
     private $roles;
+    /**
+     * @ManyToMany(targetEntity="Group", inversedBy="users")
+     */
+    private $groups;
 
     /**
      * Constructor.
@@ -63,12 +66,13 @@ class User implements UserInterface, EquatableInterface
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->username = $username;
         $this->roles = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     /**
      * Returns the roles granted to the user. Note that all users have the ROLE_USER role.
      *
-     * @return array A list of the user's roles.
+     * @return string[] A list of the user's roles.
      */
     public function getRoles()
     {
@@ -78,9 +82,33 @@ class User implements UserInterface, EquatableInterface
     }
 
     /**
+     * @return string[] A list of the user's groups.
+     */
+    public function getGroups()
+    {
+        return $this->groups->map(function (Group $group) {
+            return $group->getName();
+        })->toArray();
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function isInGroup($name)
+    {
+        foreach($this->getGroups() as $group) {
+            if($group === $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Set the user's roles to the given list.
      *
-     * @param array $roles
+     * @param Role[] $roles
      */
     public function setRoles(array $roles)
     {

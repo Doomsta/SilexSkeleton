@@ -7,10 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Table(name="role")
- * @Entity()
+ * @Entity
+ * @HasLifecycleCallbacks
  */
-class Role implements RoleInterface
+class Role extends BaseEntity implements RoleInterface
 {
     /**
      * @Column(name="id", type="integer")
@@ -26,7 +26,7 @@ class Role implements RoleInterface
     private $role;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="roles")
+     * @ManyToMany(targetEntity="User", mappedBy="roles")
      */
     private $users;
 
