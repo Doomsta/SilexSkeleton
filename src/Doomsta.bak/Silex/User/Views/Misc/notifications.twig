@@ -1,8 +1,0 @@
-{% for flashType, flashMsgs in app.session.flashbag.all %}
-    {% for flashMsg in flashMsgs %}
-        <div class="alert alert-block alert-{{ flashType }}  alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            {{ flashMsg }}
-        </div>
-    {% endfor %}
-{% endfor %}
