@@ -6,7 +6,7 @@ namespace App\Controller;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 
-class HomeController extends PageController
+class HomeController extends Controller
 {
 
     const TEMPLATE_PATH = 'Controller/Home';
@@ -17,7 +17,7 @@ class HomeController extends PageController
      */
     protected function getRoutes(ControllerCollection $controllers)
     {
-        $controllers->get('/', array($this, 'indexAction'))->bind('home.index');
+        $controllers->get('/', [$this, 'indexAction'])->bind('home.index');
         return $controllers;
     }
 
@@ -27,6 +27,7 @@ class HomeController extends PageController
      */
     public function indexAction(Request $request)
     {
+        return 'awda';
         return $this->render(self::TEMPLATE_PATH.'/index.twig');
     }
 }

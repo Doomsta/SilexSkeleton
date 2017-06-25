@@ -1,66 +1,82 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: arandel
- * Date: 25.06.17
- * Time: 15:00
- */
 
 namespace App;
 
-
+use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
-use Silex\Application\TwigTrait;
-use Silex\Application\UrlGeneratorTrait;
+use Pimple\Container;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-trait ContainerTrait
+
+trait ContainerAwareTrait
 {
+    /**
+     * @return Container
+     */
+    abstract protected function getContainer(): Container;
 
-    public function log($message, array $context = [], $level = Logger::INFO)
+    /**
+     * @return Logger
+     */
+    protected function getLogger(): Logger
     {
-        return $this->getContainer()['monolog']->addRecord($level, $message, $context);
+        return $this->getContainer()['monolog'];
+    }
+
+    protected function log($message, array $context = [], $level = Logger::INFO): bool
+    {
+        return $this->getLogger()->addRecord($level, $message, $context);
     }
 
     /**
-     * Generates a path from the given parameters.
-     *
-     * @param string $route The name of the route
-     * @param mixed $parameters An array of parameters
-     *
-     * @return string The generated path
+     * @return UrlGeneratorInterface
      */
-    public function path($route, $parameters = array())
+    protected function getUrlGenerator(): UrlGeneratorInterface
     {
-        return $this->getContainer()['url_generator']->generate($route, $parameters, UrlGeneratorInterface::ABSOLUTE_PATH);
+        return $this->getContainer()['url_generator'];
+    }
+
+    protected function path($route, $parameters = [])
+    {
+        return $this->getUrlGenerator()->generate(
+            $route,
+            $parameters,
+            UrlGeneratorInterface::ABSOLUTE_PATH
+        );
+    }
+
+    protected function url($route, $parameters = [])
+    {
+        return $this->getUrlGenerator()->generate(
+            $route,
+            $parameters,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
     /**
-     * Generates an absolute URL from the given parameters.
-     *
-     * @param string $route The name of the route
-     * @param mixed $parameters An array of parameters
-     *
-     * @return string The generated URL
+     * @return EntityManagerInterface
      */
-    public function url($route, $parameters = array())
+    protected function getEntityManager(): EntityManagerInterface
     {
-        return $this->getContainer()['url_generator']->generate($route, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->getContainer()['orm.em'];
     }
 
     /**
-     * Renders a view and returns a Response.
-     *
-     * To stream a view, pass an instance of StreamedResponse as a third argument.
-     *
-     * @param string $view The view name
-     * @param array $parameters An array of parameters to pass to the view
-     * @param Response $response A Response instance
-     *
-     * @return Response A Response instance
+     * @return \Twig_Environment
      */
-    public function render($view, array $parameters = array(), Response $response = null)
+    protected function getTwig(): \Twig_Environment
     {
-        $twig = $this->getContainer()['twig'];
+        return $this->getContainer()['twig'];
+    }
+
+    protected function render($view, array $parameters = [], Response $response = null)
+    {
+        $twig = $this->getTwig();
 
         if ($response instanceof StreamedResponse) {
             $response->setCallback(function () use ($twig, $view, $parameters) {
@@ -84,8 +100,24 @@ trait ContainerTrait
      *
      * @return string The rendered view
      */
-    public function renderView($view, array $parameters = array())
+    protected function renderView($view, array $parameters = array())
     {
-        return $this->getContainer()['twig']->render($view, $parameters);
+        return $this->getTwig()->render($view, $parameters);
+    }
+
+    /**
+     * @return \Knp\Console\Application
+     */
+    protected function getCli()
+    {
+        return $this->getContainer()['console'];
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->getContainer()['dispatcher'];
     }
 }

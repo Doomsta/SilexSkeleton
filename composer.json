@@ -1,40 +1,40 @@
 {
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/RndStuff/silex-traits.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/Doomsta/silexuser.git"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.3",
-        "silex/silex": "*",
-        "symfony/twig-bridge": "2.4.*",
-        "knplabs/console-service-provider": "dev-master",
-        "igorw/config-service-provider": "dev-master",
-        "symfony/yaml": "~2.1.",
-        "monolog/monolog": ">=1.0.0",
-        "doctrine/dbal": "*",
-        "doctrine/orm": "*",
-        "dflydev/doctrine-orm-service-provider": "*",
-        "mheap/Silex-Assetic": "1.0.*",
-        "natxet/cssmin": "*@dev",
-        "twitter/bootstrap": "dev-master",
-        "rndstuff/silex-traits": "dev-master",
-        "symfony/doctrine-bridge": "~2.3",
-        "symfony/security": "~2.6",
-        "symfony/form": "~2.6",
-        "symfony/validator": "~2.6",
-        "symfony/config": "~2.6",
-        "symfony/translation": "~2.6",
-        "symfony/security-csrf": "~2.6"
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/RndStuff/silex-traits.git"
     },
-    "autoload": {
-        "psr-0": {
-            "App\\": "src/"
-        }
+    {
+      "type": "git",
+      "url": "https://github.com/Doomsta/silexuser.git"
     }
+  ],
+  "require": {
+    "php": ">=7",
+    "silex/silex": "*",
+    "symfony/twig-bridge": "2.4.*",
+    "knplabs/console-service-provider": "dev-master",
+    "symfony/yaml": "~2.1.",
+    "monolog/monolog": ">=1.0.0",
+    "doctrine/dbal": "*",
+    "doctrine/orm": "*",
+    "dflydev/doctrine-orm-service-provider": "*",
+    "natxet/cssmin": "*@dev",
+    "twitter/bootstrap": "dev-master",
+    "symfony/doctrine-bridge": "~2.3",
+    "symfony/security": "~2.6",
+    "symfony/form": "~2.6",
+    "symfony/validator": "~2.6",
+    "symfony/config": "~2.6",
+    "symfony/translation": "~2.6",
+    "symfony/security-csrf": "~2.6"
+  },
+  "autoload": {
+    "psr-0": {
+      "App\\": "src/"
+    },
+    "classmap": [
+      "src/"
+    ]
+  }
 }
