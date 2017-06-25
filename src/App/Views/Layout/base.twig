@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+    <title> {{ app.site.title }} </title>
+    {% block stylesheets %}
+        {% stylesheets
+            '../vendor/twitter/bootstrap/dist/css/bootstrap.css'
+            '../resources/assets/css/*.css'
+            output='/assets/css/main.css'
+            filter='css'
+        %}
+            <link rel="stylesheet" href="{{ asset_url }}" />
+        {% endstylesheets %}
+    {% endblock stylesheets %}
+</head>
+<body>
+{% include 'Misc/navbar.twig' %}
+{% include 'Misc/subhead.twig' %}
+<div class="container">
+    <div class="notify">
+    {% block notifications %}
+        {% include 'Misc/notifications.twig' %}
+    {%  endblock %}
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            {% block widgets %}
+            {% endblock %}
+        </div>
+        <div class="col-lg-9">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    {% block footer %}
+    {% endblock %}
+</footer>
+{% block javascript %}
+    {% javascripts
+        '../resources/assets/js/jquery.js'
+        '../vendor/twitter/bootstrap/dist/js/bootstrap.js'
+        output='/assets/js/main.js'
+    %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+{% endblock %}
+
+</body>
+</html>
+
+
