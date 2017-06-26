@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Plugin\PluginManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 use Pimple\Container;
@@ -119,5 +120,13 @@ trait ContainerAwareTrait
     protected function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->getContainer()['dispatcher'];
+    }
+
+    /**
+     * @return PluginManager
+     */
+    protected function getPluginManager(): PluginManager
+    {
+        return $this->getContainer()['plugin.manager'];
     }
 }

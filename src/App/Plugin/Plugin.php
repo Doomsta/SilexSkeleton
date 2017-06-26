@@ -5,14 +5,12 @@ namespace App\Plugin;
 
 use App\Application;
 use App\ContainerAwareTrait;
-use Pimple\Container;
-use Silex\Api\EventListenerProviderInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Knp\Command\Command;
 
 // TODO: controller to mount in namespace
 // TODO: register services
 // TODO: dependencies
-abstract class Plugin implements EventListenerProviderInterface
+abstract class Plugin
 {
 
     use ContainerAwareTrait;
@@ -42,7 +40,8 @@ abstract class Plugin implements EventListenerProviderInterface
      * must me url save and unique
      * @return string
      */
-    public function getIdentifier(): string {
+    public function getIdentifier(): string
+    {
         return urlencode($this->getName());
     }
 
@@ -54,32 +53,21 @@ abstract class Plugin implements EventListenerProviderInterface
         return $this->app;
     }
 
-    public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
+    public function getCssFiles()
     {
-        $dispatcher->addListener('plugin.collect.jsFiles', function () {
-
-        });
-        $dispatcher->addListener('plugin.collect.cssFiles', function () {
-
-        });
-        $dispatcher->addListener('plugin.collect.cmds', function () {
-
-        });
-
-
+        return [];
     }
 
-    private $cssFiles;
-
-    protected final function addCssFile(string ...$filePath)
+    public function getJsFiles()
     {
-        $this->cssFiles += $filePath;
+        return [];
     }
 
-    private $jssFiles;
-
-    protected final function addJsFile(string ...$filePath)
+    /**
+     * @return Command[]
+     */
+    public function getCmds() :array
     {
-        $this->jssFiles += $filePath;
+        return [];
     }
 }

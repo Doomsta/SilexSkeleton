@@ -4,6 +4,10 @@ namespace App;
 
 use App\Console\Command\GreedCommand;
 use App\Controller\HomeController;
+use App\Plugin\Event\CollectCmdsEvent;
+use App\Plugin\Event\CollectJsFilesEvent;
+use App\Plugin\PluginManager;
+use App\Plugin\TestPlugin;
 use Knp\Provider\ConsoleServiceProvider;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\MonologServiceProvider;
@@ -27,7 +31,18 @@ class Application extends \Silex\Application
         if ($this['isCli']) {
             $this->initCli($this);
         }
+        $this::initPluginManager($this);
         $this->log('test');
+    }#
+
+    protected static function initPluginManager(self $app)
+    {
+        $pm = new PluginManager($app);
+        $pm->register(new TestPlugin($app));
+        $app['plugin.manager'] = $pm;
+        $event = new CollectJsFilesEvent();
+        $app->getEventDispatcher()->dispatch($event::NAME, $event);
+        print_r($event->getJsFiles());
     }
 
     protected function getContainer()
@@ -65,7 +80,7 @@ class Application extends \Silex\Application
 
     protected static function initMountPoints(self $app)
     {
-        $app->mount('/', new HomeController());#
+        $app->mount('/', new HomeController());
     }
 
     protected function initCli(self $app)
@@ -76,17 +91,11 @@ class Application extends \Silex\Application
             'console.project_directory' => ROOT_PATH
         ]);
 
-        $this->extend('console', function (ConsoleApplication $console) {
-            $console->addCommands([
-                new GreedCommand()
-            ]);
+        $this->extend('console', function (ConsoleApplication $console) use ($app){
+            $event = new CollectCmdsEvent();
+            $app->getEventDispatcher()->dispatch($event::NAME, $event);
+            $console->addCommands($event->getCmds());
             return $console;
         });
     }
-
-    public function run(Request $request = null)
-    {
-        parent::run($request);
-    }
-
 }
